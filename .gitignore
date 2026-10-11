@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Dataset files (download separately; do not commit)
+data/*
+!data/train/
+!data/test/
+data/train/*
+data/test/*
+!data/train/benign/
+!data/train/malignant/
+!data/test/benign/
+!data/test/malignant/
+
+# Keep dataset directories locally, but do not upload images
+data/train/benign/*
+data/train/malignant/*
+data/test/benign/*
+data/test/malignant/*
+
+# Local environment files
+.env
+.DS_Store
