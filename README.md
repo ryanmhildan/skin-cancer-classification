@@ -1,43 +1,110 @@
-# Skin Cancer Classification with SVM
+<div align="center">
 
-Proyek machine learning untuk mengklasifikasikan citra lesi kulit ke dalam dua kelas, **benign** (jinak) dan **malignant** (ganas), menggunakan ekstraksi fitur citra dan algoritma Support Vector Machine (SVM).
+# 🔬 Skin Cancer Classification with SVM
 
-> **Disclaimer:** Proyek ini dibuat untuk pembelajaran dan portofolio. Hasil model bukan diagnosis medis dan tidak boleh digunakan sebagai pengganti pemeriksaan tenaga medis profesional.
+Klasifikasi citra lesi kulit menjadi **benign** (jinak) dan **malignant** (ganas)
+menggunakan segmentasi K-Means, fitur tekstur GLCM, dan Support Vector Machine.
 
-## Ringkasan Proyek
+![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB?logo=python&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-SVM-F7931E?logo=scikitlearn&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-image%20processing-5C3EE8?logo=opencv&logoColor=white)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)
 
-Notebook ini mengimplementasikan alur klasifikasi citra sebagai berikut:
+</div>
 
-1. **Preprocessing** — mengubah ukuran citra menjadi 128 × 128 piksel dan mengonversi warna ke RGB.
-2. **Segmentasi lesi** — menggunakan K-Means clustering (`k=2`) dan mengasumsikan cluster dengan nilai warna rata-rata paling gelap sebagai area lesi.
-3. **Post-processing** — menghapus objek kecil dari mask segmentasi menggunakan operasi morfologi.
-4. **Ekstraksi fitur** — mengambil fitur tekstur GLCM (`contrast`, `correlation`, `energy`, `homogeneity`) serta fitur bentuk (`area`, `perimeter`).
-5. **Normalisasi fitur** — menggunakan `StandardScaler`.
-6. **Klasifikasi** — membandingkan SVM kernel `linear`, `poly`, dan `rbf`.
-7. **Tuning dan evaluasi** — melakukan pencarian parameter dengan `GridSearchCV` serta mengevaluasi model menggunakan accuracy, precision, recall, F1-score, dan confusion matrix.
+> [!WARNING]
+> Proyek ini dibuat untuk pembelajaran dan portofolio. Hasil model **bukan diagnosis medis** dan tidak boleh digunakan sebagai pengganti pemeriksaan tenaga medis profesional.
 
-## Hasil Eksperimen
+## 📑 Daftar Isi
 
-Berdasarkan output yang tersimpan di notebook:
+- [Ringkasan](#-ringkasan)
+- [Pipeline](#-pipeline)
+- [Tangkapan Layar](#-tangkapan-layar)
+- [Hasil Eksperimen](#-hasil-eksperimen)
+- [Dataset](#-dataset)
+- [Struktur Repository](#-struktur-repository)
+- [Instalasi & Menjalankan](#-instalasi--menjalankan)
+- [Teknologi](#-teknologi)
+- [Catatan Pengembangan](#-catatan-pengembangan)
+- [Author](#-author)
 
-| Model | Accuracy |
-|---|---:|
-| SVM Linear | 79.5% |
-| SVM Polynomial | 76.9% |
-| SVM RBF | 81.2% |
-| SVM RBF setelah tuning | **83.0%** |
+## 📌 Ringkasan
 
-Hasil tersebut berasal dari output notebook yang tersedia dan dapat berubah jika dataset, lingkungan, atau parameter eksperimen berbeda. Sebelum menggunakan angka ini dalam laporan, jalankan ulang notebook untuk memverifikasi hasil.
+| | |
+|---|---|
+| **Tugas** | Klasifikasi biner citra dermoskopi (benign vs malignant) |
+| **Pendekatan** | Computer vision klasik + machine learning (tanpa deep learning) |
+| **Fitur** | 4 fitur tekstur GLCM + 2 fitur bentuk |
+| **Model terbaik** | SVM RBF (`C=100`, `gamma=1`) |
+| **Akurasi terbaik** | **83,0%** pada 1.000 citra test |
 
-## Dataset
+## ⚙️ Pipeline
 
-Dataset yang digunakan adalah **Melanoma Skin Cancer Dataset of 10,605 Images** dari Kaggle oleh Hasnain Javed.
+```mermaid
+flowchart LR
+    A[Citra lesi] --> B[Preprocessing<br/>128×128, RGB]
+    B --> C[Segmentasi<br/>K-Means k=2]
+    C --> D[Morfologi<br/>hapus objek kecil]
+    D --> E[Ekstraksi fitur<br/>GLCM + bentuk]
+    E --> F[StandardScaler]
+    F --> G[SVM<br/>linear / poly / rbf]
+    G --> H[GridSearchCV<br/>& evaluasi]
+```
 
-- **Tautan dataset:** https://www.kaggle.com/datasets/hasnainjaved/melanoma-skin-cancer-dataset-of-10000-images
-- Silakan baca ketentuan penggunaan dan lisensi dataset di halaman sumber sebelum mendistribusikan data atau menggunakannya untuk tujuan lain.
-- Dataset tidak disertakan dalam repository ini. Unduh langsung dari sumbernya.
+1. **Preprocessing** — ubah ukuran citra menjadi 128 × 128 piksel dan konversi warna ke RGB.
+2. **Segmentasi lesi** — K-Means clustering (`k=2`); cluster dengan rata-rata warna paling gelap diasumsikan sebagai area lesi.
+3. **Post-processing** — hapus objek kecil dari mask menggunakan operasi morfologi.
+4. **Ekstraksi fitur** — tekstur GLCM (`contrast`, `correlation`, `energy`, `homogeneity`) dan bentuk (`area`, `perimeter`).
+5. **Normalisasi** — `StandardScaler` (fit pada data training, transform pada data test).
+6. **Klasifikasi** — bandingkan SVM kernel `linear`, `poly`, dan `rbf`.
+7. **Tuning & evaluasi** — `GridSearchCV` (10-fold) lalu evaluasi dengan accuracy, precision, recall, F1-score, dan confusion matrix.
 
-Setelah mengunduh dan mengekstrak dataset, susun folder agar sesuai dengan struktur berikut (sesuaikan jika nama folder dari arsip Kaggle berbeda):
+## 🖼️ Tangkapan Layar
+
+### Hasil Segmentasi Lesi
+
+Contoh citra asli, mask lesi hasil K-Means + morfologi, dan area lesi yang tersegmentasi.
+
+![Visualisasi segmentasi lesi](assets/segmentation_sample.png)
+
+### Confusion Matrix (SVM RBF setelah tuning)
+
+<p align="center">
+  <img src="assets/confusion_matrix.png" alt="Confusion matrix SVM RBF setelah tuning" width="480">
+</p>
+
+Dari 1.000 citra test, model memprediksi benar **420 benign** dan **410 malignant**. Terdapat **90 kasus malignant yang terprediksi benign** (false negative) — jenis kesalahan yang paling perlu diperhatikan dalam konteks medis.
+
+## 📊 Hasil Eksperimen
+
+| Model | Accuracy | Precision (macro) | Recall (macro) | F1 (macro) |
+|---|---:|---:|---:|---:|
+| SVM Linear | 79,5% | 0,80 | 0,79 | 0,79 |
+| SVM Polynomial | 76,9% | 0,80 | 0,77 | 0,76 |
+| SVM RBF | 81,2% | 0,82 | 0,81 | 0,81 |
+| **SVM RBF + tuning** (`C=100`, `gamma=1`) | **83,0%** | **0,83** | **0,83** | **0,83** |
+
+<details>
+<summary>Detail per kelas — SVM RBF setelah tuning</summary>
+
+| Kelas | Precision | Recall | F1-score | Support |
+|---|---:|---:|---:|---:|
+| benign | 0,82 | 0,84 | 0,83 | 500 |
+| malignant | 0,84 | 0,82 | 0,83 | 500 |
+
+</details>
+
+> [!NOTE]
+> Angka di atas diambil dari output yang tersimpan di notebook dan dapat berubah jika dataset, lingkungan, atau parameter berbeda. Jalankan ulang notebook untuk memverifikasi sebelum menggunakannya dalam laporan.
+
+## 📂 Dataset
+
+**[Melanoma Skin Cancer Dataset of 10,605 Images](https://www.kaggle.com/datasets/hasnainjaved/melanoma-skin-cancer-dataset-of-10000-images)** — Kaggle, oleh Hasnain Javed.
+
+- Dataset **tidak disertakan** dalam repository ini; unduh langsung dari sumbernya.
+- Baca ketentuan penggunaan dan lisensi dataset sebelum mendistribusikan atau menggunakannya untuk tujuan lain.
+
+Setelah diunduh dan diekstrak, susun folder seperti berikut (sesuaikan jika nama folder dari arsip Kaggle berbeda):
 
 ```text
 data/
@@ -49,92 +116,85 @@ data/
     └── malignant/
 ```
 
-## Struktur Repository
+## 🗂️ Struktur Repository
 
 ```text
-skin-cancer-classification-portfolio/
+skin-cancer-classification/
+├── assets/                # gambar untuk README
+│   ├── segmentation_sample.png
+│   └── confusion_matrix.png
+├── data/                  # dataset (diabaikan Git, unduh sendiri)
 ├── notebooks/
 │   └── skin_cancer_classification.ipynb
-├── data/
-│   ├── train/
-│   │   ├── benign/
-│   │   └── malignant/
-│   └── test/
-│       ├── benign/
-│       └── malignant/
-├── results/
-│   └── .gitkeep
-├── assets/
-│   └── .gitkeep
+├── results/               # output eksperimen
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
-Folder `data/` sengaja tidak berisi gambar dan diabaikan oleh Git agar repository tidak membengkak serta menghormati ketentuan distribusi dataset.
+Folder `data/` sengaja diabaikan oleh Git agar repository tetap ringan dan menghormati ketentuan distribusi dataset.
 
-## Instalasi dan Cara Menjalankan
+## 🚀 Instalasi & Menjalankan
 
-Disarankan menggunakan Python 3.10 atau 3.11.
+Disarankan menggunakan **Python 3.10 atau 3.11**.
 
-1. Clone repository:
+**1. Clone repository**
 
-   ```bash
-   git clone https://github.com/USERNAME/skin-cancer-classification-portfolio.git
-   cd skin-cancer-classification-portfolio
-   ```
+```bash
+git clone https://github.com/ryanmhildan/skin-cancer-classification.git
+cd skin-cancer-classification
+```
 
-2. Buat dan aktifkan virtual environment:
+**2. Buat dan aktifkan virtual environment**
 
-   **Windows**
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
+```bash
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
 
-   **Linux/macOS**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+# Linux / macOS
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-3. Pasang dependensi:
+**3. Pasang dependensi**
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-4. Unduh dataset dari Kaggle, ekstrak, dan letakkan ke folder `data/` sesuai struktur di atas.
+**4. Siapkan dataset** — unduh dari Kaggle, ekstrak, lalu letakkan di folder `data/` sesuai struktur di atas.
 
-5. Jalankan Jupyter Notebook:
+**5. Jalankan notebook**
 
-   ```bash
-   jupyter notebook
-   ```
+```bash
+jupyter notebook
+```
 
-   Buka `notebooks/skin_cancer_classification.ipynb` dan jalankan sel secara berurutan dari atas ke bawah.
+Buka `notebooks/skin_cancer_classification.ipynb` dan jalankan sel secara berurutan.
 
-Jika notebook tidak menemukan dataset, periksa kembali struktur folder dan pastikan nama kelas adalah `benign` serta `malignant`.
+> [!TIP]
+> Notebook awalnya dibuat di **Google Colab** dan membaca dataset dari Google Drive. Untuk menjalankan secara lokal, lewati sel `drive.mount(...)` dan ubah `DATASET_TRAIN_PATH` / `DATASET_TEST_PATH` menjadi `data/train` dan `data/test`. Pastikan nama folder kelas adalah `benign` dan `malignant`.
 
-## Teknologi
+## 🛠️ Teknologi
 
-- Python
-- OpenCV
-- NumPy dan Pandas
-- Matplotlib dan Seaborn
-- scikit-image
-- scikit-learn
-- Jupyter Notebook
+| Kategori | Library |
+|---|---|
+| Pengolahan citra | OpenCV, scikit-image |
+| Data | NumPy, Pandas |
+| Machine learning | scikit-learn |
+| Visualisasi | Matplotlib, Seaborn |
+| Lingkungan | Jupyter Notebook / Google Colab |
 
-## Catatan Pengembangan
+## 📝 Catatan Pengembangan
 
-- Validasi hasil segmentasi secara visual karena asumsi bahwa lesi selalu menjadi cluster paling gelap tidak selalu benar untuk semua citra.
-- Pastikan preprocessing dan normalisasi diterapkan secara konsisten; untuk eksperimen yang lebih ketat, `StandardScaler` sebaiknya di-fit hanya pada data training lalu digunakan untuk mentransformasi data test.
-- Evaluasi model dengan data yang benar-benar terpisah dan hindari kebocoran data saat tuning.
-- Pertimbangkan metrik tambahan seperti ROC-AUC dan analisis false negative, terutama karena konteksnya adalah klasifikasi lesi kulit.
+- **Segmentasi** — validasi hasil secara visual; asumsi bahwa lesi selalu menjadi cluster paling gelap tidak selalu benar (misalnya pada citra dengan vignette gelap di tepi, seperti terlihat pada contoh di atas).
+- **Kebocoran data** — pastikan `StandardScaler` hanya di-fit pada data training dan tuning hanya memakai data training.
+- **Metrik tambahan** — pertimbangkan ROC-AUC dan analisis false negative, mengingat konteksnya adalah deteksi lesi ganas.
+- **Pengembangan lanjut** — coba fitur warna (histogram, color moments), fitur bentuk tambahan (asimetri, kebulatan), atau pendekatan CNN/transfer learning sebagai pembanding.
 
-## Author
+## 👤 Author
 
-**Ryan Muhammad Hildan**
+**Ryan Muhammad Hildan** — proyek portofolio machine learning & computer vision.
 
-Proyek portofolio machine learning / computer vision.
+[![GitHub](https://img.shields.io/badge/GitHub-ryanmhildan-181717?logo=github)](https://github.com/ryanmhildan)
